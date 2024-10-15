@@ -2,30 +2,45 @@
   <h1>Валютный менеджер</h1>
   <p>Обменять валюту</p>
   <marquee>Текущий курс валют</marquee>
-  <input name="Валюта на руках" placeholder="На руках" id="handedCurrency" >
-  <input name="Валюта для обмена" placeholder="После обмена" id="changeCurrency" >
+  <input type="number" placeholder="На руках" v-model="curInHand">  
+  <input placeholder="После обмена" readonly v-model="exchangeValue">  
   <div id="USD">Доллар США $ — 00,0000 руб.</div>
   <div id="EUR">Евро € — 00,0000 руб.</div>
+  <button @click="currencyInHand()">Обменять</button>
+  <button >Просто кнопка</button>
+  <p>{{ typeof(curInHand) }}</p>
+  <p @input="func()">{{ jaySon }}</p>
+  
   <form>
   <label for="currency">Выбирете валюту:</label>
-  <select id="currencyHave" name="currency">
-    <option value="apple">Яблоко</option>
-    <option value="banana">Банан</option>
-    <option value="orange">Апельсин</option>
-  </select>
-  <select id="currencyGet" name="currency">
-    <option value="apple">Яблоко</option>
-    <option value="banana">Банан</option>
-    <option value="orange">Апельсин</option>
-  </select>
-  <button>Обменять</button>
-</form>
+  
+  </form>
 
 </template>
 
 
 
 <script >
+import axios from 'axios';
+export default {  
+  data (){
+    return {      
+      exchangeValue: null,
+      curInHand: null,
+      jaySon: ' ',      
+    }    
+  },
+  mounted () {    
+      axios.get('https://www.cbr-xml-daily.ru/daily_json.js')
+      .then(res => (this.jaySon = res))
+    },          
+  methods: {    
+    currencyInHand () {     
+      this.exchangeValue = 45*this.curInHand;      
+    }         
+  }, 
+  
+}
 function handleFruitChange() {
     const selectElement = document.getElementById('currency');
     const selectedFruit = selectElement.value;
