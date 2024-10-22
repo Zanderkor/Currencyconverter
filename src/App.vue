@@ -2,15 +2,17 @@
   <h1>Валютный менеджер</h1>
   <p>Обменять валюту</p>
   <marquee>Текущий курс валют</marquee>
+  <select v-model="currencyName">
+    <option v-for="curName in curArr" v-bind:value="curName">{{ curName }}</option>
+  </select>
   <input type="number" placeholder="На руках" v-model="curInHand">  
   <input placeholder="После обмена" readonly v-model="exchangeValue">  
   <div id="USD">Доллар США $ — 00,0000 руб.</div>
   <div id="EUR">Евро € — 00,0000 руб.</div>
-  <button @click="currencyInHand()">Обменять</button>
-  <button >Просто кнопка</button>
+  <button @click="currencyInHand();valueAfterChange()">Обменять</button>
+  <button >Просто кнопка</button>  
   <p>{{ typeof(curInHand) }}</p>
-  <p @input="func()">{{ jaySon }}</p>
-  
+  <p>{{ currencyName }}</p>     
   <form>
   <label for="currency">Выбирете валюту:</label>
   
@@ -27,20 +29,33 @@ export default {
     return {      
       exchangeValue: null,
       curInHand: null,
-      jaySon: ' ',      
+      multiplyCof: null,
+      jaySon: ' ',
+      curArr:[],
+      currencyList: '',
+      currencyName: '',      
     }    
   },
   mounted () {    
       axios.get('https://www.cbr-xml-daily.ru/daily_json.js')
-      .then(res => (this.jaySon = res))
-    },          
+      .then(res => (this.curArr = Object.keys(res.data.Valute)))    
+      axios.get('https://www.cbr-xml-daily.ru/daily_json.js')      
+      .then(pip => (this.currencyList = pip.data.Valute))                  
+      },
+
   methods: {    
     currencyInHand () {     
-      this.exchangeValue = 45*this.curInHand;      
-    }         
-  }, 
+      this.exchangeValue = this.curInHand;      
+    },
+    valueAfterChange () {
+      this.multiplyCof = this.currencyList[`${this.currencyName}`]["Value"]
+      this.exchangeValue=this.exchangeValue*this.multiplyCof
+    }
+    
+  },
+};
   
-}
+
 function handleFruitChange() {
     const selectElement = document.getElementById('currency');
     const selectedFruit = selectElement.value;
