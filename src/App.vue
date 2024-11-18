@@ -19,6 +19,7 @@
   <div class="container">
     <Bar id="my-chart-id" :options="chartOptions" :data="chartData" />
   </div>
+  <p v-bind:value="dateNumbers()"> Числа дат {{ today }} {{ dayDates }}</p>
 
 </template>
 
@@ -35,6 +36,7 @@ export default {
   data() {
     return {
       runLine: '',
+      today: new Date(Date.now()),      
       exchangeValue: null,
       curInHand: null,
       multiplyCof: null,
@@ -52,9 +54,10 @@ export default {
       rateGbp: null,
       rateCny: null,
       datacollection: null,
+      dayDates: [],
       chartData: {
-        labels: ['January', 'February', 'March'],
-        datasets: [{ data: [40, 20, 12] }]
+        labels: [],
+        datasets: [{ data: [40, 20, 12,5,9,32,67,9] }]
       },
       chartOptions: {
         responsive: true
@@ -70,8 +73,23 @@ export default {
         this.curArr.forEach((element) => {
         this.fullCurrencyArray.push(`${element} - ${this.currencyList[element]["Name"]}`)        
       })
-  },
+  },  
  methods: {
+  dateNumbers(){
+    try{
+    let i = 0;
+    let pasteDate = 0;
+        
+    do {            
+      i=i+1
+      pasteDate=this.today.setDate(this.today.getDate()-i)      
+      this.chartData.labels.unshift(new Date(pasteDate).toLocaleString("ru-RU", {month:'numeric',day:'numeric'}));
+      this.today.setDate(this.today.getDate()+i) 
+    }while(i<8);
+  }catch(error){
+    this.dayDates="хуйня"
+  }
+  },
     justFunction(){
     this.currencyIndex = this.fullCurrencyArray.indexOf(this.currencyShortNamePick)
     this.currencyShortName = this.curArr[this.currencyIndex]
