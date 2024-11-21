@@ -12,14 +12,14 @@
   <form>
     <label for="currency">Выбирете валюту:</label>
     <select v-model="currencyShortNamePick">
-      <option v-for="curName in fullCurrencyArray" v-bind:value="curName" > {{ curName }} </option>
+      <option v-for="curName in fullCurrencyArray" v-bind:value="curName"> {{ curName }} </option>
     </select>
   </form>
-  <p v-bind:value="justFunction()">{{ currencyIndex }}</p>  
+  <p v-bind:value="justFunction()">{{ currencyIndex }}</p>
   <div class="container">
     <Bar id="my-chart-id" :options="chartOptions" :data="chartData" />
   </div>
-  <p v-bind:value="dateNumbers()"> Числа дат {{ today }} {{ dayDates }}</p>
+  <p>Числа дат {{ today }} {{ dayDates }} </p>
 
 </template>
 
@@ -36,7 +36,7 @@ export default {
   data() {
     return {
       runLine: '',
-      today: new Date(Date.now()),      
+      today: new Date(Date.now()),
       exchangeValue: null,
       curInHand: null,
       multiplyCof: null,
@@ -44,7 +44,7 @@ export default {
       curArr: [],
       fullCurrencyArray: [],
       currencyList: '',
-      currencyInfo:'',
+      currencyInfo: '',
       currencyShortNamePick: '',
       currencyShortName: '',
       currencyFullName: '',
@@ -57,43 +57,60 @@ export default {
       dayDates: [],
       chartData: {
         labels: [],
-        datasets: [{ data: [40, 20, 12,5,9,32,67,9] }]
+        datasets: [{ data: [] }]
       },
       chartOptions: {
         responsive: true
       }
     }
   },
-  async beforeCreate() {    
+  //https://www.cbr-xml-daily.ru/archive/2024/(месяц)/(день)/daily_json.js
+  async beforeCreate() {
     axios.get('https://www.cbr-xml-daily.ru/daily_json.js')
       .then(res => (this.curArr = Object.keys(res.data.Valute)))
     await
       axios.get('https://www.cbr-xml-daily.ru/daily_json.js')
         .then(pip => (this.currencyList = pip.data.Valute))
-        this.curArr.forEach((element) => {
-        this.fullCurrencyArray.push(`${element} - ${this.currencyList[element]["Name"]}`)        
-      })
-  },  
- methods: {
-  dateNumbers(){
-    try{
-    let i = 0;
-    let pasteDate = 0;
-        
-    do {            
-      i=i+1
-      pasteDate=this.today.setDate(this.today.getDate()-i)      
-      this.chartData.labels.unshift(new Date(pasteDate).toLocaleString("ru-RU", {month:'numeric',day:'numeric'}));
-      this.today.setDate(this.today.getDate()+i) 
-    }while(i<8);
-  }catch(error){
-    this.dayDates="хуйня"
-  }
+    this.curArr.forEach((element) => {
+      this.fullCurrencyArray.push(`${element} - ${this.currencyList[element]["Name"]}`)
+    })
   },
-    justFunction(){
-    this.currencyIndex = this.fullCurrencyArray.indexOf(this.currencyShortNamePick)
-    this.currencyShortName = this.curArr[this.currencyIndex]
-    },   
+  mounted(){    
+      try {
+        let i = 0;
+        let pasteDate = 0;        
+        do {
+          i = i + 1
+          pasteDate = this.today.setDate(this.today.getDate() - i)         
+          this.chartData.labels.unshift(new Date(pasteDate).toLocaleString("ru-RU", { month: 'numeric', day: 'numeric' }));
+          this.today.setDate(this.today.getDate() + i)
+        } while (i < 30);
+      } catch (error) {
+        this.dayDates = "ошибка"
+      }
+      return this.chartData.labels    
+  },
+  /*computed: {
+    dateNumbers() {
+      try {
+        let i = 0;
+        let pasteDate = 0;        
+        do {
+          i = i + 1
+          pasteDate = this.today.setDate(this.today.getDate() - i)         
+          this.chartData.labels.unshift(new Date(pasteDate).toLocaleString("ru-RU", { month: 'numeric', day: 'numeric' }));
+          this.today.setDate(this.today.getDate() + i)
+        } while (i < 30);
+      } catch (error) {
+        this.dayDates = "хуйня"
+      }         
+    }
+  },*/
+  methods: {
+    justFunction() {
+      this.currencyIndex = this.fullCurrencyArray.indexOf(this.currencyShortNamePick)
+      this.currencyShortName = this.curArr[this.currencyIndex]
+    },
     valueAfterChange() {
       this.exchangeValue = this.curInHand;
       this.multiplyCof = this.currencyList[this.currencyShortName]["Value"];
@@ -114,14 +131,31 @@ export default {
       }
     },
     curFullNameInfoFunc() {
-      try {        
-        this.currencyFullName = this.currencyList[this.currencyShortName]["Name"]       
+      try {
+        this.currencyFullName = this.currencyList[this.currencyShortName]["Name"]
         this.currencyInfo = `Вы хотите обменять ${this.currencyList[this.currencyShortName]["Name"]}`
       } catch (error) {
         this.currencyInfo = 'Валюта не выбрана'
       }
-    },    
+    },
+    verticalChartParameter() {
+      const a = 0;
+      let indexOfNumber = 0;
+      let pasteDate = 0;
+      let pasteDay = 0;
+      let pasteMonth = 0;
+      const todayDate = new Date(Date.now()).toLocaleString("ru-RU", { month: 'numeric', day: 'numeric' })
+      /*do {
+        pasteDate=todayDate.setDate(todayDate.getDate()-a)
+
+      pasteDay = formatDate.substring(0, indexOfNumber)
+      pasteMonth = formatDate.substring(indexOfNumber + 1)
+      //axios.get(`https://www.cbr-xml-daily.ru/archive/2024/${pasteMonth}/${pasteDay}/daily_json.js`)
+        //.then(res => (this.))
+
+    }*/
   },
+}
 };
 </script>
 
